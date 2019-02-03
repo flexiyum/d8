@@ -137,32 +137,25 @@ apt-file update
 vnstat -u -i eth0
 service vnstat restart
 
-# Install Web Server
-apt-get -y install nginx php5-fpm php5-cli
-cd
+# Install Webserver Port 81
+apt-get install nginx php5 libapache2-mod-php5 php5-fpm php5-cli php5-mysql php5-mcrypt libxml-parser-perl -y
 rm /etc/nginx/sites-enabled/default
 rm /etc/nginx/sites-available/default
-wget -O /etc/nginx/nginx.conf "https://raw.githubusercontent.com/rlguia/debian-8.7-openvpn/master/nginx.conf"
-mkdir -p /home/vps/public_html
-echo "<pre>Setup by DRCYBER </pre>" > /home/vps/public_html/index.html
-echo "<?php phpinfo(); ?>" > /home/vps/public_html/info.php
-wget -O /etc/nginx/conf.d/vps.conf "https://raw.githubusercontent.com/rlguia/debian-8.7-openvpn/master/vps.conf"
+mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.old
+curl https://raw.githubusercontent.com/sslmode/my.mod/master/nginx.conf > /etc/nginx/nginx.conf
+curl https://raw.githubusercontent.com/KeningauVPS/sslmode/master/vps.conf > /etc/nginx/conf.d/vps.conf
 sed -i 's/listen = \/var\/run\/php5-fpm.sock/listen = 127.0.0.1:9000/g' /etc/php5/fpm/pool.d/www.conf
+useradd -m vps;
+mkdir -p /home/vps/public_html
+echo "<?php phpinfo() ?>" > /home/vps/public_html/info.php
+chown -R www-data:www-data /home/vps/public_html
+chmod -R g+rw /home/vps/public_html
+cd /home/vps/public_html
+wget -O /home/vps/public_html/uptime.php "http://autoscript.kepalatupai.com/uptime.php1"
+wget -O /home/vps/public_html/index.html "https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/addons/index.html1"
 service php5-fpm restart
 service nginx restart
-
-# install webserver
 cd
-clear
-echo "Installing Nginx"
-apt-get install nginx -y
-rm /etc/nginx/sites-enabled/default
-rm /etc/nginx/sites-available/default
-wget -O /etc/nginx/nginx.conf "http://vira.cf/nginx.conf"
-mkdir -p /home/vps/public_html
-echo "<pre>VenomVPN</pre>" > /home/vps/public_html/index.html
-wget -O /etc/nginx/conf.d/vps.conf "https://raw.githubusercontent.com/rlguia/debian-8.7-openvpn/master/vps.conf"
-service nginx restart
 
 # install openvpn
 clear
@@ -313,7 +306,6 @@ if [ -x /usr/bin/mrtg ] && [ -r /etc/mrtg.cfg ]; then mkdir -p /var/log/mrtg ; e
 if [ -x /usr/bin/mrtg ] && [ -r /etc/mrtg.cfg ]; then mkdir -p /var/log/mrtg ; env LANG=C /usr/bin/mrtg /etc/mrtg.cfg 2>&1 | tee -a /var/log/mrtg/mrtg.log ; fi
 cd
 
-
 #Setting USW
 apt-get install ufw
 ufw allow ssh
@@ -338,14 +330,16 @@ ufw disable
 echo 1 > /proc/sys/net/ipv4/ip_forward
 sed -i 's|#net.ipv4.ip_forward=1|net.ipv4.ip_forward=1|' /etc/sysctl.conf
 
-# install badvpn
-wget -O /usr/bin/badvpn-udpgw "https://raw.githubusercontent.com/airblue18/OS-script/master/badvpn-udpgw"
-if [ "$OS" == "x86_64" ]; then
-  wget -O /usr/bin/badvpn-udpgw "https://raw.githubusercontent.com/airblue18/OS-script/master/badvpn-udpgw64"
-fi
-sed -i '$ i\screen -AmdS badvpn badvpn-udpgw --listen-addr 127.0.0.1:7300' /etc/rc.local
-chmod +x /usr/bin/badvpn-udpgw
-screen -AmdS badvpn badvpn-udpgw --listen-addr 127.0.0.1:730
+# Badvpn
+apt-get -y install cmake make gcc
+wget https://samreysteven91.000webhostapp.com/Deb9/badvpn-1.999.128.tar.bz2
+tar xf badvpn-1.999.128.tar.bz2
+mkdir badvpn-build
+cd badvpn-build
+cmake ~/badvpn-1.999.128 -DBUILD_NOTHING_BY_DEFAULT=1 -DBUILD_UDPGW=1
+make install
+screen badvpn-udpgw --listen-addr 127.0.0.1:7300 > /dev/null &
+cd
 
 # install fail2ban
 apt-get update;apt-get -y install fail2ban;service fail2ban restart;
