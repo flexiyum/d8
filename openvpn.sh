@@ -41,7 +41,7 @@ fi
 #if [[ $vps = "zvur" ]]; then
 	
 
-	source="https://raw.githubusercontent.com/yarzardhiyit/d8-x64"
+	source="https://raw.githubusercontent.com/Vpaproject/d8"
 #fi
 
 geteasyrsa () {
