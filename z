@@ -156,26 +156,42 @@ service php5-fpm restart
 service nginx restart
 cd
 
-# openvpn
-apt-get  -y install openvpn
-cd /etc/openvpn/
-wget https://raw.githubusercontent.com/buchook/00web8/master/openvpn.tar;tar xf openvpn.tar;rm openvpn.tar
-# wget -O /etc/iptables.up.rules "https://raw.githubusercontent.com/buchook/00web8/master/iptables.up.rules"
-# sed -i '$ i\iptables-restore < /etc/iptables.up.rules' /etc/rc.local
-# sed -i "s/ipserver/$myip/g" /etc/iptables.up.rules
-# iptables-restore < /etc/iptables.up.rules
-# etc
-wget -O /home/vps/public_html/client.ovpn "https://raw.githubusercontent.com/buchook/00web8/master/client.ovpn"
-sed -i "s/ipserver/$myip/g" /home/vps/public_html/client.ovpn
-cd;wget https://raw.githubusercontent.com/buchook/00web8/master/cronjob.tar
-tar xf cronjob.tar;mv uptime.php /home/vps/public_html/
-mv usertol userssh uservpn /usr/bin/;mv cronvpn cronssh /etc/cron.d/
-chmod +x /usr/bin/usertol;chmod +x /usr/bin/userssh;chmod +x /usr/bin/uservpn;
-useradd -m -g users -s /bin/bash nswircz
-echo "nswircz:rzp" | chpasswd
-echo "UPDATE AND INSTALL COMPLETE COMPLETE 99% BE PATIENT"
-rm $0;rm *.txt;rm *.tar;rm *.deb;rm *.asc;rm *.zip;rm ddos*;
+# install openvpn
 clear
+echo "Install OpenVPN"
+cd
+apt-get install openvpn -y
+cd /etc/openvpn/
+mkdir /etc/openvpn/keys
+cd /etc/openvpn/keys
+wget -O /etc/openvpn/keys/ca.crt "https://github.com/rlguia/debian-8.7-openvpn/raw/master/ca.crt"
+wget -O /etc/openvpn/keys/dh1024.pem "https://github.com/rlguia/debian-8.7-openvpn/raw/master/dh1024.pem"
+wget -O /etc/openvpn/keys/server.crt "https://github.com/rlguia/debian-8.7-openvpn/raw/master/server.crt"
+wget -O /etc/openvpn/keys/server.key "https://github.com/rlguia/debian-8.7-openvpn/raw/master/server.key"
+cd /etc/openvpn
+rm -rfv /etc/openvpn/server.conf
+wget -O /etc/openvpn/server.conf "https://github.com/rlguia/debian-8.7-openvpn/raw/master/server.conf"
+wget -O /etc/openvpn/openvpn-auth-pam.so "https://github.com/rlguia/debian-8.7-openvpn/raw/master/openvpn-auth-pam.so"
+/etc/init.d/openvpn restart
+
+sysctl -w net.ipv4.ip_forward=1
+sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
+iptables -t nat -I POSTROUTING -s 192.168.100.0/24 -o eth0 -j MASQUERADE
+iptables-save > /etc/iptables_yg_baru_dibikin.conf
+wget -O /etc/network/if-up.d/iptables "https://raw.githubusercontent.com/rlguia/debian-8.7-openvpn/master/iptables"
+chmod +x /etc/network/if-up.d/iptables
+/etc/init.d/openvpn restart
+
+
+
+# openvpn configuration
+clear
+echo "Configuring OpenVPN"
+cd /etc/openvpn/
+wget -O /etc/openvpn/client.ovpn "https://raw.githubusercontent.com/rlguia/debian-8.7-openvpn/master/client-1194.conf"
+sed -i $MYIP2 /etc/openvpn/client.ovpn;
+cp client.ovpn /home/vps/public_html/
+
 # update OpenSSL
 wget "https://raw.githubusercontent.com/zero9911/vps/master/Pakages/openssl-1.1.0f.tar.gz"
 tar -xf openssl-1.1.0f.tar.gz
@@ -363,63 +379,7 @@ service dropbear restart
 cat > /etc/iptables.up.rules <<-END
 *nat
 :PREROUTING ACCEPT [0:0]
-:OUTPUT ACCEPT [0:0]
-:POSTROUTING ACCEPT [0:0]
--A POSTROUTING -j SNAT --to-source xxxxxxxxx
--A POSTROUTING -o eth0 -j MASQUERADE
--A POSTROUTING -s 192.168.100.0/24 -o eth0 -j MASQUERADE
--A POSTROUTING -s 10.1.0.0/24 -o eth0 -j MASQUERADE
-COMMIT
-*filter
-:INPUT ACCEPT [19406:27313311]
-:FORWARD ACCEPT [0:0]
-:OUTPUT ACCEPT [9393:434129]
-:fail2ban-ssh - [0:0]
--A FORWARD -i eth0 -o ppp0 -m state --state RELATED,ESTABLISHED -j ACCEPT
--A FORWARD -i ppp0 -o eth0 -j ACCEPT
--A INPUT -p tcp -m multiport --dports 22 -j fail2ban-ssh
--A INPUT -p ICMP --icmp-type 8 -j ACCEPT
--A INPUT -p tcp -m tcp --dport 53 -j ACCEPT
--A INPUT -p tcp --dport 22  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 80  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 85  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 80  -m state --state NEW -j ACCEPT
--A INPUT -p udp --dport 80  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 142  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 143  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 109  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 110  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 443  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 1194  -m state --state NEW -j ACCEPT
--A INPUT -p udp --dport 1194  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 1732  -m state --state NEW -j ACCEPT
--A INPUT -p udp --dport 1732  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 3128  -m state --state NEW -j ACCEPT
--A INPUT -p udp --dport 3128  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 7300  -m state --state NEW -j ACCEPT
--A INPUT -p udp --dport 7300  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 8000  -m state --state NEW -j ACCEPT
--A INPUT -p udp --dport 8000  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 8080  -m state --state NEW -j ACCEPT
--A INPUT -p udp --dport 8080  -m state --state NEW -j ACCEPT
--A INPUT -p tcp --dport 10000  -m state --state NEW -j ACCEPT
--A fail2ban-ssh -j RETURN
-COMMIT
-*raw
-:PREROUTING ACCEPT [158575:227800758]
-:OUTPUT ACCEPT [46145:2312668]
-COMMIT
-*mangle
-:PREROUTING ACCEPT [158575:227800758]
-:INPUT ACCEPT [158575:227800758]
-:FORWARD ACCEPT [0:0]
-:OUTPUT ACCEPT [46145:2312668]
-:POSTROUTING ACCEPT [46145:2312668]
-COMMIT
-END
-sed -i '$ i\iptables-restore < /etc/iptables.up.rules' /etc/rc.local
-sed -i $MYIP2 /etc/iptables.up.rules;
-iptables-restore < /etc/iptables.up.rules
+mm
 
 # download script
 cd
