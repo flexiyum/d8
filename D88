@@ -293,34 +293,69 @@ service fail2ban restart
 # install squid3
 apt-get -y install squid3
 cat > /etc/squid3/squid.conf <<-END
-acl manager proto cache_object
-acl localhost src 127.0.0.1/32 ::1
-acl to_localhost dst 127.0.0.0/8 0.0.0.0/32 ::1
-acl SSL_ports port 443
-acl Safe_ports port 80
-acl Safe_ports port 21
-acl Safe_ports port 443
-acl Safe_ports port 70
-acl Safe_ports port 210
-acl Safe_ports port 1025-65535
-acl Safe_ports port 280
-acl Safe_ports port 488
-acl Safe_ports port 591
-acl Safe_ports port 777
-acl CONNECT method CONNECT
-acl SSH dst xxxxxxxxx-xxxxxxxxx/255.255.255.255
-http_access allow SSH
-http_access allow manager localhost
-http_access deny manager
-http_access allow localhost
-http_access deny all
 http_port 8080
-coredump_dir /var/spool/squid3
-refresh_pattern ^ftp:		1440	20%	10080
-refresh_pattern ^gopher:	1440	0%	1440
-refresh_pattern -i (/cgi-bin/|\?) 0	0%	0
-refresh_pattern .		0	20%	4320
-visible_hostname proxy.mrberi
+http_port 3128
+http_port 1080
+http_port 8118
+visible_hostname DAM20-VPS
+acl ip dstdomain -i 157.230.37.173
+acl r3v dstdomain -i 127.0.0.1
+acl r3v dstdomain -i 200.169.126.11
+acl r3v dstdomain -i localhost
+acl r3v dstdomain -i localnet
+acl accept dstdomain -i GET
+acl accept dstdomain -i POST
+acl accept dstdomain -i OPTIONS
+acl accept dstdomain -i CONNECT
+acl accept dstdomain -i PUT
+acl HEAD dstdomain -i HEAD
+acl accept dstdomain -i TRACE
+acl accept dstdomain -i OPTIONS
+acl accept dstdomain -i PATCH
+acl accept dstdomain -i PROPATCH
+acl accept dstdomain -i DELETE
+acl accept dstdomain -i REQUEST
+acl accept dstdomain -i METHOD
+acl accept dstdomain -i NETDATA
+acl accept dstdomain -i MOVE
+acl all src 0.0.0.0/0
+http_access allow ip
+http_access allow r3v
+http_access allow accept
+http_access allow HEAD
+http_access deny all
+forwarded_for off
+request_header_access Allow allow all
+request_header_access Authorization allow all
+request_header_access WWW-Authenticate allow all
+request_header_access Proxy-Authorization allow all
+request_header_access X-Online-Host allow all
+request_header_access Proxy-Authenticate allow all
+request_header_access Cache-Control allow all
+request_header_access Content-Encoding allow all
+request_header_access Content-Length allow all
+request_header_access Content-Type allow all
+request_header_access Date allow all
+request_header_access Expires allow all
+request_header_access Host allow all
+request_header_access If-Modified-Since allow all
+request_header_access Last-Modified allow all
+request_header_access Location allow all
+request_header_access Pragma allow all
+request_header_access Accept allow all
+request_header_access Accept-Charset allow all
+request_header_access Accept-Encoding allow all
+request_header_access Accept-Language allow all
+request_header_access Content-Language allow all
+request_header_access Mime-Version allow all
+request_header_access Retry-After allow all
+request_header_access Title allow all
+request_header_access Connection allow all
+request_header_access Proxy-Connection allow all
+request_header_access User-Agent allow all
+request_header_access Cookie allow all
+request_header_access Referer allow all
+request_header_access Host allow all
 END
 sed -i $MYIP2 /etc/squid3/squid.conf;
 service squid3 restart
