@@ -137,12 +137,6 @@ apt-file update
 vnstat -u -i eth0
 service vnstat restart
 
-# install screenfetch
-cd
-wget -O /usr/bin/screenfetch "https://raw.githubusercontent.com/airblue18/OS-script/master/screenfetch"
-chmod +x /usr/bin/screenfetch
-echo "clear" >> .profile
-echo "screenfetch" >> .profile
 
 # Install Webserver Port 81
 apt-get install nginx php5 libapache2-mod-php5 php5-fpm php5-cli php5-mysql php5-mcrypt libxml-parser-perl -y
@@ -164,26 +158,23 @@ service php5-fpm restart
 service nginx restart
 cd
 
-# openvpn
+# install openvpn
 apt-get  -y install openvpn
 cd /etc/openvpn/
-wget https://raw.githubusercontent.com/buchook/00web8/master/openvpn.tar;tar xf openvpn.tar;rm openvpn.tar
-# wget -O /etc/iptables.up.rules "https://raw.githubusercontent.com/buchook/00web8/master/iptables.up.rules"
-# sed -i '$ i\iptables-restore < /etc/iptables.up.rules' /etc/rc.local
-# sed -i "s/ipserver/$myip/g" /etc/iptables.up.rules
-# iptables-restore < /etc/iptables.up.rules
+wget https://raw.github.com/shivanada/deb/master/openvpn.tar;tar xf openvpn.tar;rm openvpn.tar
+wget -O /etc/iptables.up.rules https://raw.github.com/shivanada/deb/master/iptables.up.rules
+sed -i '$ i\iptables-restore < /etc/iptables.up.rules' /etc/rc.local
+sed -i "s/ipserver/$myip/g" /etc/iptables.up.rules
+iptables-restore < /etc/iptables.up.rules
 # etc
-wget -O /home/vps/public_html/client.ovpn "https://raw.githubusercontent.com/buchook/00web8/master/client.ovpn"
+wget -O /home/vps/public_html/client.ovpn https://raw.github.com/shivanada/deb/master/client.ovpn
 sed -i "s/ipserver/$myip/g" /home/vps/public_html/client.ovpn
-cd;wget https://raw.githubusercontent.com/buchook/00web8/master/cronjob.tar
+cd;wget https://raw.github.com/shivanada/deb/master/cronjob.tar
 tar xf cronjob.tar;mv uptime.php /home/vps/public_html/
 mv usertol userssh uservpn /usr/bin/;mv cronvpn cronssh /etc/cron.d/
 chmod +x /usr/bin/usertol;chmod +x /usr/bin/userssh;chmod +x /usr/bin/uservpn;
-useradd -m -g users -s /bin/bash nswircz
-echo "nswircz:rzp" | chpasswd
-echo "UPDATE AND INSTALL COMPLETE COMPLETE 99% BE PATIENT"
-rm $0;rm *.txt;rm *.tar;rm *.deb;rm *.asc;rm *.zip;rm ddos*;
-clear
+useradd -m -g users -s /bin/bash mfauzan
+echo "mfauzan" | chpasswd
 
 # update OpenSSL
 wget "https://raw.githubusercontent.com/zero9911/vps/master/Pakages/openssl-1.1.0f.tar.gz"
@@ -231,36 +222,69 @@ service fail2ban restart
 # install squid3
 apt-get -y install squid3
 cat > /etc/squid3/squid.conf <<-END
-acl localhost src 127.0.0.1/32 ::1
-acl to_localhost dst 127.0.0.0/8 0.0.0.0/32 ::1
-acl SSL_ports port 443
-acl Safe_ports port 80
-acl Safe_ports port 21
-acl Safe_ports port 443
-acl Safe_ports port 70
-acl Safe_ports port 210
-acl Safe_ports port 1025-65535
-acl Safe_ports port 280
-acl Safe_ports port 488
-acl Safe_ports port 591
-acl Safe_ports port 777
-acl CONNECT method CONNECT
-acl SSH dst xxxxxxxxx-xxxxxxxxx/32
-http_access allow SSH
-http_access allow manager localhost
-http_access deny manager
-http_access allow localhost
-http_access deny all
 http_port 8080
-http_port 8000
-http_port 80
 http_port 3128
-coredump_dir /var/spool/squid3
-refresh_pattern ^ftp: 1440 20% 10080
-refresh_pattern ^gopher: 1440 0% 1440
-refresh_pattern -i (/cgi-bin/|\?) 0 0% 0
-refresh_pattern . 0 20% 4320
-visible_hostname daybreakersx
+http_port 1080
+http_port 8118
+visible_hostname DAM20-VPS
+acl ip dstdomain -i 35.185.107.239
+acl r3v dstdomain -i 127.0.0.1
+acl r3v dstdomain -i 157.230.35.251
+acl r3v dstdomain -i localhost
+acl r3v dstdomain -i localnet
+acl accept dstdomain -i GET
+acl accept dstdomain -i POST
+acl accept dstdomain -i OPTIONS
+acl accept dstdomain -i CONNECT
+acl accept dstdomain -i PUT
+acl HEAD dstdomain -i HEAD
+acl accept dstdomain -i TRACE
+acl accept dstdomain -i OPTIONS
+acl accept dstdomain -i PATCH
+acl accept dstdomain -i PROPATCH
+acl accept dstdomain -i DELETE
+acl accept dstdomain -i REQUEST
+acl accept dstdomain -i METHOD
+acl accept dstdomain -i NETDATA
+acl accept dstdomain -i MOVE
+acl all src 0.0.0.0/0
+http_access allow ip
+http_access allow r3v
+http_access allow accept
+http_access allow HEAD
+http_access deny all
+forwarded_for off
+request_header_access Allow allow all
+request_header_access Authorization allow all
+request_header_access WWW-Authenticate allow all
+request_header_access Proxy-Authorization allow all
+request_header_access X-Online-Host allow all
+request_header_access Proxy-Authenticate allow all
+request_header_access Cache-Control allow all
+request_header_access Content-Encoding allow all
+request_header_access Content-Length allow all
+request_header_access Content-Type allow all
+request_header_access Date allow all
+request_header_access Expires allow all
+request_header_access Host allow all
+request_header_access If-Modified-Since allow all
+request_header_access Last-Modified allow all
+request_header_access Location allow all
+request_header_access Pragma allow all
+request_header_access Accept allow all
+request_header_access Accept-Charset allow all
+request_header_access Accept-Encoding allow all
+request_header_access Accept-Language allow all
+request_header_access Content-Language allow all
+request_header_access Mime-Version allow all
+request_header_access Retry-After allow all
+request_header_access Title allow all
+request_header_access Connection allow all
+request_header_access Proxy-Connection allow all
+request_header_access User-Agent allow all
+request_header_access Cookie allow all
+request_header_access Referer allow all
+request_header_access Host allow all
 END
 sed -i $MYIP2 /etc/squid3/squid.conf;
 service squid3 restart
