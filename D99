@@ -116,7 +116,7 @@ wget -O /etc/issue.net "https://raw.githubusercontent.com/guardeumvpn/Qwer77/mas
 
 # dropbear
 apt-get -y install dropbear
-wget -O /etc/default/dropbear "https://raw.githubusercontent.com/guardeumvpn/Qwer77/master/dropbear"
+wget -O /etc/default/dropbear "https://raw.githubusercontent.com/Vpaproject/d8/master/dropbear"
 echo "/bin/false" >> /etc/shells
 echo "/usr/sbin/nologin" >> /etc/shells
 
