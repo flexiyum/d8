@@ -300,8 +300,8 @@ acl Safe_ports port 591
 acl Safe_ports port 777
 acl CONNECT method CONNECT
 acl SSH dst 157.230.35.251-157.230.35.251/255.255.255.255
-acl SSH dst 35.232.44.140-35.232.44.140/255.255.255.255
-acl SSH dst 35.232.44.141-35.232.44.141/255.255.255.255
+acl SSH dst 175.139.218.9-175.139.218.9/255.255.255.255
+acl SSH dst 175.139.218.9-175.139.218.9/255.255.255.255
 http_access allow SSH
 http_access allow manager localhost
 http_access deny manager
