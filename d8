@@ -144,7 +144,7 @@ rm /etc/nginx/sites-enabled/default
 rm /etc/nginx/sites-available/default
 mv /etc/nginx/nginx.conf /etc/nginx/nginx.conf.old
 curl https://raw.githubusercontent.com/sslmode/my.mod/master/nginx.conf > /etc/nginx/nginx.conf
-curl https://raw.githubusercontent.com/KeningauVPS/sslmode/master/vps.conf > /etc/nginx/conf.d/vps.conf
+curl https://raw.githubusercontent.com/GegeEmbrie/autosshvpn/master/file/vps.conf > /etc/nginx/conf.d/vps.conf
 sed -i 's/listen = \/var\/run\/php5-fpm.sock/listen = 127.0.0.1:9000/g' /etc/php5/fpm/pool.d/www.conf
 useradd -m vps;
 mkdir -p /home/vps/public_html
@@ -221,76 +221,19 @@ cd
 # install fail2ban
 apt-get -y install fail2ban
 service fail2ban restart
-
 # install squid3
-apt-get -y install squid3
-cat > /etc/squid3/squid.conf <<-END
-http_port 8080
-http_port 3128
-http_port 1080
-http_port 8118
-visible_hostname DAM20-VPS
-acl ip dstdomain -i 157.230.35.251
-acl r3v dstdomain -i 127.0.0.1
-acl r3v dstdomain -i 35.185.107.239
-acl r3v dstdomain -i localhost
-acl r3v dstdomain -i localnet
-acl accept dstdomain -i GET
-acl accept dstdomain -i POST
-acl accept dstdomain -i OPTIONS
-acl accept dstdomain -i CONNECT
-acl accept dstdomain -i PUT
-acl HEAD dstdomain -i HEAD
-acl accept dstdomain -i TRACE
-acl accept dstdomain -i OPTIONS
-acl accept dstdomain -i PATCH
-acl accept dstdomain -i PROPATCH
-acl accept dstdomain -i DELETE
-acl accept dstdomain -i REQUEST
-acl accept dstdomain -i METHOD
-acl accept dstdomain -i NETDATA
-acl accept dstdomain -i MOVE
-acl all src 0.0.0.0/0
-http_access allow ip
-http_access allow r3v
-http_access allow accept
-http_access allow HEAD
-http_access deny all
-forwarded_for off
-request_header_access Allow allow all
-request_header_access Authorization allow all
-request_header_access WWW-Authenticate allow all
-request_header_access Proxy-Authorization allow all
-request_header_access X-Online-Host allow all
-request_header_access Proxy-Authenticate allow all
-request_header_access Cache-Control allow all
-request_header_access Content-Encoding allow all
-request_header_access Content-Length allow all
-request_header_access Content-Type allow all
-request_header_access Date allow all
-request_header_access Expires allow all
-request_header_access Host allow all
-request_header_access If-Modified-Since allow all
-request_header_access Last-Modified allow all
-request_header_access Location allow all
-request_header_access Pragma allow all
-request_header_access Accept allow all
-request_header_access Accept-Charset allow all
-request_header_access Accept-Encoding allow all
-request_header_access Accept-Language allow all
-request_header_access Content-Language allow all
-request_header_access Mime-Version allow all
-request_header_access Retry-After allow all
-request_header_access Title allow all
-request_header_access Connection allow all
-request_header_access Proxy-Connection allow all
-request_header_access User-Agent allow all
-request_header_access Cookie allow all
-request_header_access Referer allow all
-request_header_access Host allow all
-END
-sed -i $MYIP2 /etc/squid3/squid.conf;
-service squid3 restart
+
+cd
+
+apt-get update;apt-get -y install wget curl
+
+wget https://raw.githubusercontent.com/PakTam/debianos7/master/squid3.sh
+
+chmod 100 squid.sh
+
+./squid.sh
+
+/etc/init.d/squid3 restart
 
 # install stunnel4
 apt-get -y install stunnel4
